@@ -235,7 +235,10 @@ def handle_multiplicador(mid):
     enviar_estado()
 
 if __name__ == "__main__":
+    import os
+    port = int(os.environ.get("PORT", 5000))
     init_db()
     load_progress()
-    socketio.start_background_task(background_task)
-    socketio.run(app, host="0.0.0.0", port=5000, debug=False)
+    threading.Thread(target=loop_incremento, daemon=True).start()
+    socketio.run(app, host="0.0.0.0", port=port)
+
