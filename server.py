@@ -1,3 +1,4 @@
+# server.py
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 import threading
@@ -6,23 +7,20 @@ import random
 import sqlite3
 import json
 import math
-import os
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
 lock = threading.Lock()
 cookies = 0.0
 
-# Mejoras base
 mejoras_base = {
     "cursor":  {"nombre": "Cursor", "base_price": 15, "cps": 0.1},
     "abuela":  {"nombre": "Abuela", "base_price": 100, "cps": 1},
     "granja":  {"nombre": "Granja", "base_price": 1100, "cps": 8},
-    "fabrica": {"nombre": "Fábrica", "base_price": 12000, "cps": 47}
+    "fabrica": {"nombre": "Fábrica", "base_price": 12000, "cps": 47},
 }
 
-# Multiplicadores base
 multiplicadores_base = {
     "eficacia_1": {"nombre": "x1.2 Eficiencia", "factor": 1.2, "precio": 1000},
     "eficacia_2": {"nombre": "x1.5 Eficiencia", "factor": 1.5, "precio": 5000},
@@ -40,14 +38,12 @@ def init_db():
             nombre TEXT PRIMARY KEY,
             mejoras TEXT,
             multiplicadores TEXT
-        )
-        """)
+        )""")
         cur.execute("""
         CREATE TABLE IF NOT EXISTS estado (
             key TEXT PRIMARY KEY,
             value TEXT
-        )
-        """)
+        )""")
         con.commit()
 
 def save_progress():
@@ -82,16 +78,13 @@ def load_usuario_progreso(nombre):
             mejoras = json.loads(row[0])
             multiplicadores = json.loads(row[1])
             return mejoras, multiplicadores
-        else:
-            return None, None
+        return None, None
 
 def calcular_precio(base_price, cantidad):
     return math.ceil(base_price * (1.15 ** cantidad))
 
 def calcular_cps_jugador(usuario):
-    base_cps = 0.0
-    for mid, cantidad in usuario["mejoras"].items():
-        base_cps += mejoras_base[mid]["cps"] * cantidad
+    base_cps = sum(mejoras_base[mid]["cps"] * cantidad for mid, cantidad in usuario["mejoras"].items())
     multiplicador = 1.0
     for mid, comprado in usuario["multiplicadores"].items():
         if comprado:
@@ -133,12 +126,12 @@ def handle_login(nombre):
     if not nombre.strip():
         nombre = f"Jugador{random.randint(1000,9999)}"
 
-    mejoras_guardadas, mult_guardados = load_usuario_progreso(nombre)
+    mejoras, mult = load_usuario_progreso(nombre)
     with lock:
         usuarios[request.sid] = {
             "nombre": nombre,
-            "mejoras": mejoras_guardadas if mejoras_guardadas else {mid: 0 for mid in mejoras_base},
-            "multiplicadores": mult_guardados if mult_guardados else {mid: False for mid in multiplicadores_base}
+            "mejoras": mejoras if mejoras else {mid: 0 for mid in mejoras_base},
+            "multiplicadores": mult if mult else {mid: False for mid in multiplicadores_base}
         }
     emit("login_ok", {"nombre": nombre})
     enviar_estado()
@@ -147,8 +140,8 @@ def handle_login(nombre):
 def handle_disconnect():
     with lock:
         if request.sid in usuarios:
-            usuario = usuarios[request.sid]
-            save_usuario_progreso(usuario["nombre"], usuario["mejoras"], usuario["multiplicadores"])
+            u = usuarios[request.sid]
+            save_usuario_progreso(u["nombre"], u["mejoras"], u["multiplicadores"])
             del usuarios[request.sid]
     enviar_estado()
 
@@ -160,19 +153,19 @@ def handle_click():
     enviar_estado()
 
 @socketio.on("comprar")
-def handle_compra(mejora_id):
+def handle_compra(mid):
     global cookies
     with lock:
         if request.sid not in usuarios:
             return
-        if mejora_id in mejoras_base:
-            usuario = usuarios[request.sid]
-            cantidad = usuario["mejoras"][mejora_id]
-            precio = calcular_precio(mejoras_base[mejora_id]["base_price"], cantidad)
+        if mid in mejoras_base:
+            u = usuarios[request.sid]
+            cantidad = u["mejoras"][mid]
+            precio = calcular_precio(mejoras_base[mid]["base_price"], cantidad)
             if cookies >= precio:
                 cookies -= precio
-                usuario["mejoras"][mejora_id] += 1
-                save_usuario_progreso(usuario["nombre"], usuario["mejoras"], usuario["multiplicadores"])
+                u["mejoras"][mid] += 1
+                save_usuario_progreso(u["nombre"], u["mejoras"], u["multiplicadores"])
     enviar_estado()
 
 @socketio.on("comprar_multiplicador")
@@ -182,18 +175,15 @@ def handle_multiplicador(mid):
         if request.sid not in usuarios:
             return
         if mid in multiplicadores_base:
-            usuario = usuarios[request.sid]
-            comprado = usuario["multiplicadores"][mid]
-            precio = multiplicadores_base[mid]["precio"]
-            if not comprado and cookies >= precio:
-                cookies -= precio
-                usuario["multiplicadores"][mid] = True
-                save_usuario_progreso(usuario["nombre"], usuario["mejoras"], usuario["multiplicadores"])
+            u = usuarios[request.sid]
+            if not u["multiplicadores"][mid] and cookies >= multiplicadores_base[mid]["precio"]:
+                cookies -= multiplicadores_base[mid]["precio"]
+                u["multiplicadores"][mid] = True
+                save_usuario_progreso(u["nombre"], u["mejoras"], u["multiplicadores"])
     enviar_estado()
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
     init_db()
     load_progress()
     threading.Thread(target=loop_incremento, daemon=True).start()
-    socketio.run(app, host="0.0.0.0", port=port)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=False)
