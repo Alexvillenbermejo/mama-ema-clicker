@@ -186,4 +186,4 @@ if __name__ == "__main__":
     init_db()
     load_progress()
     threading.Thread(target=loop_incremento, daemon=True).start()
-    socketio.run(app, host="0.0.0.0", port=5000, debug=False)
+    socketio.run(app, host="0.0.0.0", port=5000, debug=False, allow_unsafe_werkzeug=True)
