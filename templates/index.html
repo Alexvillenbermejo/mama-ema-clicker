@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Cookie Clicker Cooperativo</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<div id="login-container">
+    <h2>¡Bienvenido!</h2>
+    <p>Escribe tu nombre o déjalo vacío para recibir uno aleatorio:</p>
+    <input type="text" id="nombreInput" placeholder="Tu nombre..." />
+    <button id="entrarBtn">Entrar</button>
+</div>
+
+<div id="game-container" style="display:none;">
+    <div id="sidebar">
+        <h3>Jugadores conectados</h3>
+        <ul id="jugadores-lista"></ul>
+    </div>
+
+    <div id="main">
+        <h1>🍪 Cookies: <span id="cookie-count">0</span></h1>
+        <h2>CPS total: <span id="cps-count">0</span></h2>
+        <button id="click-btn">Click!</button>
+
+        <h2>Tus mejoras</h2>
+        <div id="tienda-container"></div>
+
+        <h2>Tus multiplicadores</h2>
+        <div id="tienda-mult-container"></div>
+
+        <p id="mensaje"></p>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+<script src="/static/main.js"></script>
+
+</body>
+</html>

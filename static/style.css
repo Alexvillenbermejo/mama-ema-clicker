@@ -1,0 +1,167 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #fdf6e3;
+    color: #333;
+}
+
+#login-container {
+    text-align: center;
+    margin-top: 100px;
+}
+
+#login-container input {
+    padding: 10px;
+    font-size: 16px;
+}
+
+#login-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-left: 10px;
+    background-color: #6c9e4f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#login-container button:hover {
+    background-color: #57853f;
+}
+
+#game-container {
+    display: flex;
+    height: 100vh;
+}
+
+#sidebar {
+    width: 250px;
+    background-color: #f3f3f3;
+    padding: 15px;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+}
+
+#sidebar h3 {
+    margin-top: 0;
+}
+
+#main {
+    flex-grow: 1;
+    padding: 20px;
+    text-align: center;
+}
+
+#click-btn {
+    font-size: 30px;
+    padding: 20px 60px;
+    background-color: #f49b42;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: background-color 0.3s ease;
+}
+
+#click-btn:hover {
+    background-color: #d6832f;
+}
+
+#tienda-container,
+#tienda-mult-container {
+    margin-top: 30px;
+    text-align: left;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mejora {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.mejora button {
+    margin-top: 5px;
+    padding: 5px 10px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.mejora button:hover {
+    background-color: #3d8c3f;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+ul li {
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Galleta Dorada */
+#galleta-dorada {
+    background-color: #f7d44c;
+    color: #333;
+    font-size: 20px;
+    padding: 15px 30px;
+    border: 2px solid #b28b00;
+    border-radius: 12px;
+    margin-top: 20px;
+    cursor: pointer;
+    animation: brillo 1.5s infinite;
+}
+
+@keyframes brillo {
+    0%, 100% { box-shadow: 0 0 10px #ffd700; }
+    50% { box-shadow: 0 0 25px #ffeb3b; }
+}
+
+/* Mensaje de evento global */
+#mensaje {
+    font-size: 18px;
+    font-weight: bold;
+    color: #d35400;
+    margin-top: 15px;
+}
+
+#galleta-dorada {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: gold;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    animation: brillar 1s infinite alternate;
+}
+
+@keyframes brillar {
+    from { transform: scale(1); }
+    to { transform: scale(1.1); }
+}
+#boost-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #ffe082;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2);
+    color: #333;
+    z-index: 1000;
+}
